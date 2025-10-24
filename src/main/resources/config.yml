@@ -16,9 +16,7 @@ link_route: link
 # You can also use <click:open_url:'{JOIN}'>click here</click>
 # if you are not getting kicked from the server on join (only with MiniMessage)
 kick_message: |
-  <gray>To play, you need to link your <color:#5865f2>Discord<gray> account.
-
-  <gray>Please go to <green>{KICK} <gray>to link your account.
+  <click:open_url:{JOIN}><b><light_purple>[Link din discord her]</light_purple></b></click>
 
 # You can find these values in your Discord application's settings
 client_id: 000000000000000000
