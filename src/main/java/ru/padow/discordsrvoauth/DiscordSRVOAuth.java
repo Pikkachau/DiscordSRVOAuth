@@ -216,37 +216,6 @@ public class DiscordSRVOAuth extends JavaPlugin implements Listener {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(AsyncPlayerPreLoginEvent event) {
-        AccountLinkManager accountLinkManager = DiscordSRV.getPlugin().getAccountLinkManager();
-        if (accountLinkManager == null) return;
-
-        UUID playerUuid = event.getUniqueId();
-        String discordId = accountLinkManager.getDiscordIdBypassCache(playerUuid);
-
-        if (discordId == null) {
-            String code = accountLinkManager.generateCode(playerUuid);
-            String route = "/" + config.getString("link_route") + "?code=" + code;
-
-            String kickMessage =
-                    config.getString("kick_message")
-                            .replaceAll("&", "§")
-                            .replace("{JOIN}", Utils.getBaseURL(config, true) + route)
-                            .replace("{KICK}", Utils.getBaseURL(config, false) + route);
-
-            try {
-                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
-
-                event.disallow(
-                        AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST,
-                        MiniMessage.miniMessage().deserialize(kickMessage));
-            } catch (Exception e) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, kickMessage);
-            }
-        }
-    }
-
     private void startServer() {
         stopServer();
 
