@@ -178,6 +178,28 @@ public class DiscordSRVOAuth extends JavaPlugin implements Listener {
                                     + getDescription().getVersion()
                                     + "\n§aMade by §1PadowYT2");
         }
+        if (cmd.getName().equalsIgnoreCase("dlink")) {
+            if (!(sender instanceof Player)) throw new Exception();
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+            AccountLinkManager accountLinkManager = DiscordSRV.getPlugin().getAccountLinkManager();
+            if (accountLinkManager == null) return;
+            UUID playerUuid = sender.getUniqueId();
+            String discordId = accountLinkManager.getDiscordIdBypassCache(playerUuid);
+            if (discordId == null) {
+                String code = accountLinkManager.generateCode(playerUuid);
+                String route = "/" + config.getString("link_route") + "?code=" + code;
+                String kickMessage =
+                    config.getString("kick_message")
+                    .replaceAll("&", "§")
+                    .replace("{JOIN}", Utils.getBaseURL(config, true) + route)
+                    .replace("{KICK}", Utils.getBaseURL(config, false) + route);
+                sender.sendMessage(
+                    MiniMessage.miniMessage().deserialize(message));
+        } else {
+            sender.sendMessage("Already linked! Use /discord unlink to unlink your discord! Then try again.");
+            
+
+        }
 
         return false;
     }
