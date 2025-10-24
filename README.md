@@ -1,3 +1,5 @@
+the changes to this fork is that it makes the plugin have a /dlink command that gives the link instead of kicking you.
+
 <img src="assets/logo.png" align="left">
 <h3>DiscordSRVOAuth</h3>
 Allow players to link their Discord account via Discord OAuth2
