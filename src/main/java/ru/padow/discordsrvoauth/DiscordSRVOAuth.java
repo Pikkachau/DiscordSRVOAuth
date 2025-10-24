@@ -165,6 +165,19 @@ public class DiscordSRVOAuth extends JavaPlugin implements Listener {
                 return true;
             }
         }
+        if (cmd.getName().equalsIgnoreCase("discordsrvoauth")) {
+                            try {
+                    if (!(sender instanceof Player)) throw new Exception();
+                    Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+
+                    sender.sendMessage(
+                            MiniMessage.miniMessage().deserialize("\n" + message + "\n"));
+                } catch (Exception e) {
+                    sender.sendMessage(
+                            "§6DiscordSRVOAuth §7v"
+                                    + getDescription().getVersion()
+                                    + "\n§aMade by §1PadowYT2");
+        }
 
         return false;
     }
