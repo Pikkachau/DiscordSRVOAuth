@@ -104,6 +104,7 @@ public class DiscordSRVOAuth extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(this, this);
         getCommand("discordsrvoauth").setExecutor(this);
+        getCommand("link").setExecutor(this);
     }
 
     @Override
@@ -164,6 +165,35 @@ public class DiscordSRVOAuth extends JavaPlugin implements Listener {
 
                 return true;
             }
+        } else if (cmd.getName().equalsIgnoreCase("link")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("§cOnly players can use this command");
+                return true;
+            }
+
+            Player player = (Player) sender;
+            AccountLinkManager accountLinkManager = DiscordSRV.getPlugin().getAccountLinkManager();
+            String discordId = accountLinkManager.getDiscordIdBypassCache(player.getUniqueId());
+
+            if (discordId != null) {
+                player.sendMessage("§aYou are already linked!");
+                return true;
+            }
+
+            String code = accountLinkManager.generateCode(player.getUniqueId());
+            String route = "/" + config.getString("link_route") + "?code=" + code;
+            String message = config.getString("link_message")
+                    .replaceAll("&", "§")
+                    .replace("{JOIN}", Utils.getBaseURL(config, true) + route)
+                    .replace("{KICK}", Utils.getBaseURL(config, false) + route); // Keeping {KICK} just in case user uses it in link_message too as a placeholder alias
+
+             try {
+                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+                player.sendMessage(MiniMessage.miniMessage().deserialize(message));
+            } catch (Exception e) {
+                player.sendMessage(message);
+            }
+            return true;
         }
 
         return false;
@@ -184,32 +214,7 @@ public class DiscordSRVOAuth extends JavaPlugin implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(AsyncPlayerPreLoginEvent event) {
-        AccountLinkManager accountLinkManager = DiscordSRV.getPlugin().getAccountLinkManager();
-        if (accountLinkManager == null) return;
-
-        UUID playerUuid = event.getUniqueId();
-        String discordId = accountLinkManager.getDiscordIdBypassCache(playerUuid);
-
-        if (discordId == null) {
-            String code = accountLinkManager.generateCode(playerUuid);
-            String route = "/" + config.getString("link_route") + "?code=" + code;
-
-            String kickMessage =
-                    config.getString("kick_message")
-                            .replaceAll("&", "§")
-                            .replace("{JOIN}", Utils.getBaseURL(config, true) + route)
-                            .replace("{KICK}", Utils.getBaseURL(config, false) + route);
-
-            try {
-                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
-
-                event.disallow(
-                        AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST,
-                        MiniMessage.miniMessage().deserialize(kickMessage));
-            } catch (Exception e) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, kickMessage);
-            }
-        }
+        // Logic removed: Player is no longer kicked if not linked
     }
 
     private void startServer() {
